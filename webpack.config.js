@@ -28,6 +28,26 @@ const optimization = () => {
 
 const filename = ext => (isDev ? `[name].${ext}` : `[name].[hash].${ext}`);
 
+const cssLoaders = extra => {
+  const loaders = [
+    {
+      loader: MiniCssExtractPlugin.loader,
+      options: {
+        // без перезагрузки
+        hmr: isDev,
+        relloadAll: true
+      }
+    },
+    "css-loader"
+  ];
+
+  if (extra) {
+    loaders.push(extra);
+  }
+
+  return loaders;
+};
+
 module.exports = {
   // Указывает на базовый каталог для разрешения точек входа и загрузчиков из конфигурации
   context: path.resolve(__dirname, "src"),
@@ -83,47 +103,15 @@ module.exports = {
         // css-loader - позволяет webpackу понимать импорты файлов с расширением css и импортировать в js стили
         // style-loader - он в данном случае добавляет стили из css в секцию head в html
         // MiniCssExtractPlugin.loader - выносит css в отдельный файл
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              // без перезагрузки
-              hmr: isDev,
-              relloadAll: true
-            }
-          },
-          "css-loader"
-        ]
+        use: cssLoaders()
       },
       {
         test: /\.less$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              // без перезагрузки
-              hmr: isDev,
-              relloadAll: true
-            }
-          },
-          "css-loader",
-          "less-loader"
-        ]
+        use: cssLoaders("less-loader")
       },
       {
         test: /\.s[ac]ss$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              // без перезагрузки
-              hmr: isDev,
-              relloadAll: true
-            }
-          },
-          "css-loader",
-          "sass-loader"
-        ]
+        use: cssLoaders("sass-loader")
       },
       // file-loader - позволяет webpackу понимать импорты файлов с расширением (png|jpg|gif|svg) и импортировать в js
       { test: /\.(png|jpg|gif|svg)$/, use: ["file-loader"] },
